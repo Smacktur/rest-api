@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "rest-api"
+version = "0.1.0"
+description = "REST API для работы с алертами"
+authors = ["Smacktur <smacktur@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.113.0"
+uvicorn = "^0.30.0"
+sqlite-utils = "^3.33.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
