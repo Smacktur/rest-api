@@ -7,23 +7,23 @@ class Database:
         self._create_table()
 
     def _create_table(self):
-        # Обновляем таблицу, добавляем колонку mm_post_id, если её нет
+        # Создаём таблицу, если её нет
         query_create = """
         CREATE TABLE IF NOT EXISTS alerts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             fingerprint TEXT NOT NULL UNIQUE,
             created_at TEXT NOT NULL,
-            status TEXT NOT NULL,
-            mm_post_id TEXT
+            status TEXT NOT NULL
         )
         """
         self.conn.execute(query_create)
         self.conn.commit()
 
-        # Проверяем, есть ли колонка mm_post_id, если нет — добавляем
+        # Проверяем наличие колонки mm_post_id
         query_check_column = "PRAGMA table_info(alerts)"
         columns = [row[1] for row in self.conn.execute(query_check_column).fetchall()]
         if "mm_post_id" not in columns:
+            # Добавляем колонку, если её нет
             self.conn.execute("ALTER TABLE alerts ADD COLUMN mm_post_id TEXT")
             self.conn.commit()
 
