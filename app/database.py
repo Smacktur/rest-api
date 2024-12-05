@@ -1,18 +1,20 @@
 import sqlite3
-from datetime import datetime
 import logging
+from datetime import datetime
 
+# Настройка логгера
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 class Database:
     def __init__(self, db_path):
+        logger.info("Initializing Database")
         self.conn = sqlite3.connect(db_path, check_same_thread=False)
         self._create_table()
 
     def _create_table(self):
-    # Лог создания таблицы
         logger.info("Checking if the table 'alerts' exists.")
+        # Создаём таблицу, если её нет
         query_create = """
         CREATE TABLE IF NOT EXISTS alerts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -26,6 +28,7 @@ class Database:
         logger.info("Table 'alerts' checked or created.")
 
         # Проверяем наличие колонки mm_post_id
+        logger.info("Checking for column 'mm_post_id' in 'alerts'.")
         query_check_column = "PRAGMA table_info(alerts)"
         columns = [row[1] for row in self.conn.execute(query_check_column).fetchall()]
         logger.info(f"Current columns in 'alerts': {columns}")
