@@ -27,7 +27,7 @@ async def add_alert(
     ):
     if db.get_alert(fingerprint):
         raise HTTPException(status_code=400, detail="Alert already exists")
-    db.add_alert(fingerprint, status, mm_post_id)
+    db.add_alert(fingerprint, alertname, status, mm_post_id)
     return {"message": "Alert added successfully"}
 
 @app.post("/resolve-alert")
