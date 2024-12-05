@@ -40,7 +40,7 @@ class Database:
                 "mm_post_id": row[3],
                 "status": row[4],
                 "created_at": row[5],
-                "updated_at": row[6]
+                "updated_at": row[6],
             }
             if row
             else None
@@ -48,10 +48,10 @@ class Database:
 
     def add_alert(self, fingerprint, alertname, status, mm_post_id=None):
         query = """
-        INSERT INTO alerts (fingerprint, alertname, mm_post_id, status, created_at, updated_at)
+        INSERT INTO alerts (fingerprint, alertname, status, mm_post_id, created_at, updated_at)
         VALUES (?, ?, ?, ?, ?, ?)
         """
-        self.conn.execute(query, (fingerprint, alertname, mm_post_id, status, datetime.now().isoformat(), datetime.now().isoformat() ))
+        self.conn.execute(query, (fingerprint, alertname, status, mm_post_id, datetime.now().isoformat(), datetime.now().isoformat() ))
         self.conn.commit()
 
     def update_alert_status(self, fingerprint, new_status):
