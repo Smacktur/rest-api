@@ -14,35 +14,20 @@ class Database:
 
     def _create_table(self):
         logger.info("Checking if the table 'alerts' exists.")
-        # Создаём таблицу, если её нет
         query_create = """
         CREATE TABLE IF NOT EXISTS alerts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             fingerprint TEXT NOT NULL UNIQUE,
+            alertname TEXT,
+            mm_post_id TEXT,
+            status TEXT NOT NULL,
             created_at TEXT NOT NULL,
-            status TEXT NOT NULL
+            updated_at TEXT
         )
         """
         self.conn.execute(query_create)
         self.conn.commit()
         logger.info("Table 'alerts' checked or created.")
-
-        # Проверяем наличие колонки mm_post_id
-        logger.info("Checking for column 'mm_post_id' in 'alerts'.")
-        query_check_column = "PRAGMA table_info(alerts)"
-        columns = [row[1] for row in self.conn.execute(query_check_column).fetchall()]
-        logger.info(f"Current columns in 'alerts': {columns}")
-
-        if "mm_post_id" not in columns:
-            logger.info("Column 'mm_post_id' is missing. Adding it now.")
-            try:
-                self.conn.execute("ALTER TABLE alerts ADD COLUMN mm_post_id TEXT")
-                self.conn.commit()
-                logger.info("Column 'mm_post_id' added successfully.")
-            except Exception as e:
-                logger.error(f"Failed to add column 'mm_post_id': {e}")
-        else:
-            logger.info("Column 'mm_post_id' already exists.")
 
     def get_alert(self, fingerprint):
         query = "SELECT * FROM alerts WHERE fingerprint = ?"
@@ -51,21 +36,34 @@ class Database:
         return (
             {
                 "fingerprint": row[1],
-                "created_at": row[2],
-                "status": row[3],
-                "mm_post_id": row[4],
+                "alertname": row[2],
+                "mm_post_id": row[3],
+                "status": row[4],
+                "created_at": row[5],
+                "updated_at": row[6]
             }
             if row
             else None
         )
 
-    def add_alert(self, fingerprint, status, mm_post_id=None):
+    def add_alert(self, fingerprint, alertname, status, mm_post_id=None):
         query = """
-        INSERT INTO alerts (fingerprint, created_at, status, mm_post_id)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO alerts (fingerprint, alertname, mm_post_id, status, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?)
         """
-        self.conn.execute(query, (fingerprint, datetime.now().isoformat(), status, mm_post_id))
+        self.conn.execute(query, (fingerprint, alertname, mm_post_id, status, datetime.now().isoformat(), datetime.now().isoformat() ))
         self.conn.commit()
+
+    def update_alert_status(self, fingerprint, new_status):
+        logger.info(f"Updating alert with fingerprint: {fingerprint}")
+        query = """
+        UPDATE alerts
+        SET status = ?, updated_at = ?
+        WHERE fingerprint = ?
+        """
+        self.conn.execute(query, (new_status, datetime.now().isoformat(), fingerprint))
+        self.conn.commit()
+        logger.info(f"Alert with fingerprint {fingerprint} updated successfully.")
 
     def get_all_alerts(self):
         query = "SELECT * FROM alerts"
@@ -74,9 +72,18 @@ class Database:
             {
                 "id": row[0],
                 "fingerprint": row[1],
-                "created_at": row[2],
-                "status": row[3],
-                "mm_post_id": row[4],
+                "alertname": row[2],
+                "mm_post_id": row[3],
+                "status": row[4],
+                "created_at": row[5],
+                "updated_at": row[6],
             }
             for row in cursor.fetchall()
         ]
+    
+    def delete_all_alerts(self):
+        logger.info("Deleting all alerts from the database.")
+        query = "DELETE FROM alerts"
+        self.conn.execute(query)
+        self.conn.commit()
+        logger.info("All alerts deleted successfully.")
