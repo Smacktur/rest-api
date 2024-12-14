@@ -2,6 +2,7 @@ version: "3.8"
 
 services:
   rest-api:
+    container_name: rest-api
     build:
       context: .
       dockerfile: Dockerfile
