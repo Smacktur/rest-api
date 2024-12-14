@@ -18,7 +18,7 @@ class Database:
         CREATE TABLE IF NOT EXISTS alerts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             alert_id TEXT NOT NULL UNIQUE,
-            fingerprint TEXT NOT NULL UNIQUE,
+            fingerprint TEXT NOT NULL,
             alertname TEXT,
             mm_post_id TEXT,
             status TEXT NOT NULL,
