@@ -32,7 +32,7 @@ class Database:
 
     def get_alert(self, alert_id):
         query = "SELECT * FROM alerts WHERE alert_id = ?"
-        cursor = self.conn.execute(query, (alert_id))
+        cursor = self.conn.execute(query, (alert_id,))
         row = cursor.fetchone()
         return (
             {

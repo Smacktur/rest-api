@@ -32,5 +32,8 @@ RUN poetry config virtualenvs.create false && poetry install --no-interaction --
 # Копируем остальной код в контейнер
 COPY . /app/
 
+# Делаем файл rmalertsdb.sh исполняемым
+RUN chmod +x rmalertsdb.sh
+
 # Указываем команду запуска бота
-CMD poetry run python /app/init_db.py && poetry run uvicorn app.main:app --host 0.0.0.0 --port 5000
+CMD sh rmalertsdb.sh && poetry run python /app/init_db.py && poetry run uvicorn app.main:app --host 0.0.0.0 --port 5000
